@@ -60,7 +60,8 @@ export function SignupForm({ ...props }: React.ComponentProps<typeof Card>) {
   const router = useRouter()
   const [isChecking, setIsChecking] = useState(false);
   const [usernameMessage, setUsernameMessage] = useState("");
-  const[loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [isUnique, setIsUnique] = useState(false);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -78,6 +79,9 @@ export function SignupForm({ ...props }: React.ComponentProps<typeof Card>) {
   const [debouncedUsername] = useDebounceValue(username, 600);
 
   const onSubmit = async (formData: z.infer<typeof formSchema>) => {
+    if(!isUnique){
+      return
+    }
     setLoading(true)
     try {
       const { data, error } = await authClient.signUp.email({
@@ -118,10 +122,12 @@ export function SignupForm({ ...props }: React.ComponentProps<typeof Card>) {
 
         if (res.status === 200) {
           setUsernameMessage("Username is available");
+          setIsUnique(true);
         }
       } catch (err: any) {
         if (err.response?.status === 400) {
           setUsernameMessage("Username already exists");
+          setIsUnique(false)
         } else {
           setUsernameMessage("Error checking username");
         }
@@ -169,9 +175,15 @@ export function SignupForm({ ...props }: React.ComponentProps<typeof Card>) {
                     </p>
                   )}
                   {!isChecking && username && usernameMessage && (
-                    <p className="text-sm">
-                      {usernameMessage}
-                    </p>
+                    isUnique ? (
+                      <p className="text-sm">
+                        {usernameMessage}
+                      </p>
+                    ) : (
+                      <p className="text-sm text-red-400">
+                        {usernameMessage}
+                      </p>
+                    )
                   )}
                 </Field>
               )}

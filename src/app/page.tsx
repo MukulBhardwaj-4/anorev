@@ -158,14 +158,6 @@ export default function Home() {
             <span className="block h-2.5 w-5 rounded-sm bg-foreground" />
             <span>Built for honest feedback. © {new Date().getFullYear()} ano rev</span>
           </div>
-          <nav className="flex gap-4">
-            <a href="#" className="hover:text-foreground">
-              Privacy
-            </a>
-            <a href="#" className="hover:text-foreground">
-              Terms
-            </a>
-          </nav>
         </div>
       </footer>
     </>

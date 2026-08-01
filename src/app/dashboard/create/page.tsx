@@ -56,16 +56,15 @@ export default function page() {
       })
       if (!data) {
         console.log("Error while creating room")
+        setLoading(false)
         return
       }
       toast.success("Room created successfully")
       router.push("/dashboard")
     } catch (error) {
       console.log(error)
-      throw new Error("Error in creating room function")
-    }
-    finally {
       setLoading(false)
+      throw new Error("Error in creating room function")
     }
   }
 

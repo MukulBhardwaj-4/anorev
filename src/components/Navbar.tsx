@@ -30,12 +30,17 @@ export function Navbar() {
             toast.success("Sined out successfully")
             router.push("/signin")
           },
+          onError: () => {
+            toast.error("Failed to sign out")
+            setLoading(false)
+          },
         },
       })
     } catch (error) {
+      setLoading(false)
+      toast.error("Failed to sign out")
       console.log(error)
     } finally {
-      setLoading(false)
     }
   }
 

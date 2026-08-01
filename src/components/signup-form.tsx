@@ -92,6 +92,7 @@ export function SignupForm({ ...props }: React.ComponentProps<typeof Card>) {
 
       if (!data) {
         toast.error(error?.message || "Sign up failed")
+        setLoading(false)
         return
       }
 
@@ -104,7 +105,6 @@ export function SignupForm({ ...props }: React.ComponentProps<typeof Card>) {
       router.push("/verifyEmail")
     } catch (error: any) {
       toast.error(error?.message || "Error while signing up")
-    } finally{
       setLoading(false)
     }
   }

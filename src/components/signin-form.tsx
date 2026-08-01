@@ -63,14 +63,15 @@ export function SigninForm({className, ...props}: React.ComponentProps<"div">) {
 
       if (!data) {
         toast.error(error?.message || "Login failed")
+        setLoading(false)
         return
       }
 
       toast.success("Login successful")
       router.push("/dashboard")
     } catch (err) {
+      console.log(err);
       toast.error("Something went wrong")
-    } finally{
       setLoading(false)
     }
   }

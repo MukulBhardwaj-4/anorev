@@ -16,6 +16,9 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "anorev",
   description: "anonymous reviewer",
+  icons: {
+    icon: '/anorev-icon.svg',
+  }
 };
 
 export default function RootLayout({

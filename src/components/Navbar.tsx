@@ -50,7 +50,7 @@ export function Navbar() {
 
   return (
     <div className="flex sticky z-20 border-b border-border bg-background/85 backdrop-blur-sm flex-col w-full">
-      <div className="flex items-center justify-between px-15 py-2">
+      <div className="flex items-center justify-between px-15 py-2">  
         <Link href="/dashboard" className="flex items-center gap-2.5 font-medium">
           <span className="block h-2.5 w-5 rounded-sm bg-foreground" />
           <span className="font-mono text-base tracking-tight">

@@ -15,7 +15,7 @@ export const sendEmail = async (
 ): Promise<IResend> => {
     try {
         await resend.emails.send({
-            from: 'Your App <onboarding@resend.dev>',
+            from: 'anorev <astraaero@send.astraaero.work.gd>',
             to: email,
             subject: type,
             react: VerificationEmail({otp: otp }),

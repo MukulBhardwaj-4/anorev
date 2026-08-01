@@ -1,6 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { EyeOff, CheckCircle2, Zap } from "lucide-react";
 import Link from "next/link";
+import Image from "next/image";
 
 const steps = [
   {
@@ -43,12 +44,12 @@ export default function Home() {
     <>
       <header className="sticky top-0 z-20 border-b border-border bg-background/85 backdrop-blur-sm">
         <div className="mx-auto flex w-full max-w-5xl items-center justify-between px-6 py-4">
-          <a href="#" className="flex items-center gap-2.5 font-medium">
+          <Link href="/" className="flex items-center gap-2.5 font-medium">
             <span className="block h-2.5 w-5 rounded-sm bg-foreground" />
             <span className="font-mono text-base tracking-tight">
               ano<span className="text-primary">rev</span>
             </span>
-          </a>
+          </Link>
           <div className="flex items-center gap-2">
             <Button variant="ghost" asChild>
               <Link href="/signin">Sign in</Link>

@@ -11,13 +11,28 @@ export async function GET(req: Request) {
         Date.now() - 24 * 60 * 60 * 1000
     );
 
-    const result = await db.collection("user").deleteMany({
+    const users = await db.collection("user").find({
         emailVerified: false,
         createdAt: { $lt: oneDayAgo },
-    });
+    }).project({ _id: 1, email: 1 }).toArray();
 
-    return NextResponse.json({
-        success: true,
-        deletedUsers: result.deletedCount,
-    });
+    if (users.length === 0) {
+        return NextResponse.json({
+            success: true,
+            deletedUsers: 0,
+            deletedSessions: 0,
+            deletedAccounts: 0,
+            deletedVerifications: 0,
+        });
+    }
+
+    const userIds = users.map(u => u._id);
+    const emails = users.map(u => u.email);
+
+    await db.collection("session").deleteMany({ userId: { $in: userIds } });
+    await db.collection("account").deleteMany({ userId: { $in: userIds } });
+    await db.collection("verification").deleteMany({ identifier: { $in: emails } });
+    const result = await db.collection("user").deleteMany({ _id: { $in: userIds } });
+
+    return NextResponse.json({ success: true, deletedUsers: result.deletedCount });
 }

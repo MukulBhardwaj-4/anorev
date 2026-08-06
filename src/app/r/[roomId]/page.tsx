@@ -9,7 +9,7 @@ import { Field, FieldDescription, FieldLabel } from "@/components/ui/field"
 import { Textarea } from "@/components/ui/textarea"
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
-import axios from "axios";
+import { api } from "@/utils/ApiClient";
 
 type Room = {
     username: string,
@@ -30,17 +30,16 @@ export default function page() {
     useEffect(() => {
         const getStatus = async () => {
             try {
-                const response = await axios.get(`/api/r/${roomId}`);
-                const roomData = response.data;
-                if (!roomData || roomData.message === "Room not found") {
-                    setRoomFound(false);
-                    return;
-                }
+                const { data: roomData } = await api.get(`/r/${roomId}`);
                 setChecked(!!roomData.isAcceptingMessages);
-                setSubmitted(roomData?.hasReviewed)
+                setSubmitted(!!roomData.hasReviewed)
                 setRoom(roomData);
-            } catch (error) {
-                console.error(error);
+            } catch (error: any) {
+                if (error.response?.status === 404) {
+                    setRoomFound(false);
+                } else {
+                    toast.error(error.message);
+                }
             }
             finally {
                 setLoading(false)
@@ -48,22 +47,14 @@ export default function page() {
         };
         getStatus();
     }, [])
-
     const handleSubmit = async () => {
         setLoading(true);
-
         try {
-            const { data } = await axios.post(`/api/r/${roomId}`, {
-                textReview: review,
-            });
-
-            if (!data) return;
-
+            await api.post(`/r/${roomId}`, { textReview: review });
             toast.success("Review submitted successfully");
-
             setSubmitted(true);
-        } catch (error) {
-            console.error(error);
+        } catch (error: any) {
+            toast.error(error.message);
         } finally {
             setLoading(false);
         }

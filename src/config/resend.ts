@@ -1,6 +1,5 @@
 import VerificationEmail from '@/components/VerifyEmailTemplate';
 import { Resend } from 'resend';
-import { auth } from '@/lib/auth';
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 

@@ -24,7 +24,7 @@ import { useForm, Controller } from "react-hook-form"
 import { authClient } from "@/lib/auth-client"
 import { useDebounceValue } from "usehooks-ts";
 import { useEffect, useState } from "react"
-import axios from "axios"
+import { api } from "@/utils/ApiClient"
 import { Loader2 } from "lucide-react"
 
 
@@ -78,8 +78,8 @@ export function SignupForm({ ...props }: React.ComponentProps<typeof Card>) {
   const username = form.watch("fullName");
   const [debouncedUsername] = useDebounceValue(username, 600);
 
-  const onSubmit = async (formData: z.infer<typeof formSchema>) => {
-    if(!isUnique){
+const onSubmit = async (formData: z.infer<typeof formSchema>) => {
+    if (!isUnique) {
       return
     }
     setLoading(true)
@@ -107,29 +107,30 @@ export function SignupForm({ ...props }: React.ComponentProps<typeof Card>) {
       toast.error(error?.message || "Error while signing up")
       setLoading(false)
     }
-  }
+}
 
-  useEffect(() => {
+useEffect(() => {
     if (!debouncedUsername || username.length < 3) return;
 
     const checkUsername = async () => {
       setIsChecking(true);
 
       try {
-        const res = await axios.post("/api/checkUsername", {
+        const { data } = await api.post("/checkUsername", {
           username: debouncedUsername,
         });
 
-        if (res.status === 200) {
+        if (data.available) {
           setUsernameMessage("Username is available");
           setIsUnique(true);
         }
       } catch (err: any) {
-        if (err.response?.status === 400) {
+        if (err.response?.status === 409) {
           setUsernameMessage("Username already exists");
-          setIsUnique(false)
+          setIsUnique(false);
         } else {
           setUsernameMessage("Error checking username");
+          setIsUnique(false);
         }
       } finally {
         setIsChecking(false);
@@ -137,7 +138,7 @@ export function SignupForm({ ...props }: React.ComponentProps<typeof Card>) {
     };
 
     checkUsername();
-  }, [debouncedUsername]);
+}, [debouncedUsername]);
 
     if(loading){
       return(

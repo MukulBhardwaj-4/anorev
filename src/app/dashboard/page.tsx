@@ -4,8 +4,9 @@ import { RoomCard } from "@/components/RoomCard"
 import { Label } from "@/components/ui/label"
 import { Switch } from "@/components/ui/switch"
 import { useEffect, useState } from "react"
-import axios from "axios";
+import { api } from "@/utils/ApiClient"
 import { Loader2 } from "lucide-react"
+import { toast } from "sonner"
 
 interface RoomData {
   username: string;
@@ -23,24 +24,19 @@ export default function Page() {
   useEffect(() => {
     const getStatus = async () => {
       try {
-        const { data } = await axios.get(
-          "/api/accept-message"
-        );
+        const { data } = await api.get("/accept-message");
         setChecked(data ?? false);
       } catch (error) {
         console.error(error);
       }
     };
-
     getStatus();
   }, []);
 
   useEffect(() => {
     const getRoomData = async () => {
       try {
-        const { data } = await axios.get(
-          "/api/rooms"
-        );
+        const { data } = await api.get("/rooms");
         setRoomData(data);
       } catch (error) {
         console.error(error);
@@ -55,12 +51,9 @@ export default function Page() {
   const handleToggle = async (value: boolean) => {
     setChecked(value);
     try {
-      await axios.patch("/api/accept-message", {
-        msgStatus: value,
-      },
-      );
-    } catch (error) {
-      console.error(error);
+      await api.patch("/accept-message", { msgStatus: value });
+    } catch (error: any) {
+      toast.error(error.message);
       setChecked(!value);
     }
   };

@@ -27,7 +27,7 @@ export function Navbar() {
       await authClient.signOut({
         fetchOptions: {
           onSuccess: () => {
-            toast.success("Sined out successfully")
+            toast.success("Signed out successfully")
             router.push("/signin")
           },
           onError: () => {

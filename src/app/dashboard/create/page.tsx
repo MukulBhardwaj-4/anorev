@@ -9,7 +9,7 @@ import { toast } from "sonner"
 import { useRouter } from "next/navigation"
 import { Loader2 } from "lucide-react"
 import { useForm } from "react-hook-form"
-import axios from "axios"
+import { api } from "@/utils/ApiClient"
 import z from "zod"
 import { zodResolver } from "@hookform/resolvers/zod"
 
@@ -44,27 +44,13 @@ export default function page() {
   const onSubmit = async (formData: z.infer<typeof formSchema>) => {
     setLoading(true)
     try {
-      const contentUrl = formData.contentUrl
-      const description = formData.description
-      if (!contentUrl || !contentUrl.trim() || !description || !description.trim()) {
-        throw new Error("All fields are needed")
-      }
-
-      const { data } = await axios.post("/api/rooms", {
-        contentUrl,
-        description
-      })
-      if (!data) {
-        console.log("Error while creating room")
-        setLoading(false)
-        return
-      }
+      await api.post("/rooms", formData)
       toast.success("Room created successfully")
       router.push("/dashboard")
-    } catch (error) {
-      console.log(error)
+
+    } catch (error: any) {
+      toast.error(error.message)
       setLoading(false)
-      throw new Error("Error in creating room function")
     }
   }
 

@@ -1,32 +1,34 @@
 import { db } from "@/lib/auth";
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
+import { apiHandler } from "@/utils/ApiHandler";
+import { ApiError } from "@/utils/ApiError";
+import { ApiResponse } from "@/utils/ApiResponse";
 
-export async function GET(req: Request) {
-    const authHeader = req.headers.get('Authorization');
+export const GET = apiHandler(async (req: NextRequest) => {
+    const authHeader = req.headers.get("Authorization");
     const cronSecret = process.env.CRON_SECRET;
     if (!cronSecret || authHeader !== `Bearer ${cronSecret}`) {
-        return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+        throw new ApiError(401, "Unauthorized");
     }
-    const oneDayAgo = new Date(
-        Date.now() - 24 * 60 * 60 * 1000
-    );
 
-    const totalUsers = await db.collection("user").countDocuments({});
-    const unverifiedTotal = await db.collection("user").countDocuments({ emailVerified: false });
-    const dbName = db.databaseName;
+    const oneDayAgo = new Date(Date.now() - 24 * 60 * 60 * 1000);
 
     const users = await db.collection("user").find({
         emailVerified: false,
         createdAt: { $lt: oneDayAgo },
     }).project({ _id: 1, email: 1 }).toArray();
 
-    return NextResponse.json({
-        debug: {
-            dbName,
-            totalUsers,
-            unverifiedTotal,
-            oneDayAgoUsed: oneDayAgo,
-            matchedCount: users.length,
-        }
-    });
-}
+    if (users.length === 0) {
+        return NextResponse.json(new ApiResponse(200, { deletedUsers: 0 }), { status: 200 });
+    }
+
+    const userIds = users.map(u => u._id);
+    const emails = users.map(u => u.email);
+
+    await db.collection("session").deleteMany({ userId: { $in: userIds } });
+    await db.collection("account").deleteMany({ userId: { $in: userIds } });
+    await db.collection("verification").deleteMany({ identifier: { $in: emails } });
+    const result = await db.collection("user").deleteMany({ _id: { $in: userIds } });
+
+    return NextResponse.json(new ApiResponse(200, { deletedUsers: result.deletedCount }), { status: 200 });
+});

@@ -1,6 +1,6 @@
 "use client"
 
-import axios from "axios";
+import { api } from "@/utils/ApiClient";
 import { useRouter } from "next/navigation";
 import { Loader2, Copy, Check, ExternalLink, Trash2 } from "lucide-react"
 import { useParams } from "next/navigation";
@@ -38,18 +38,12 @@ export default function Page() {
         return
       }
       try {
-        const { data } = await axios.get(
-          `/api/rooms/${roomId}`
-        );
-        if (!data) {
-          console.error("Room not found");
-          return;
-        }
+        const { data } = await api.get(`/rooms/${roomId}`);
         setRoom(data);
         setReviews(data.reviews)
         setRoomUrl(`${window.location.origin}/r/${roomId}`)
-      } catch (error) {
-        console.error(error);
+      } catch (error: any) {
+        toast.error(error.message);
       }
       finally {
         setLoading(false)
@@ -71,11 +65,11 @@ export default function Page() {
 
   const handleDeleteRoom = async () => {
     try {
-      await axios.delete(`/api/rooms/${roomId}`);
+      await api.delete(`/rooms/${roomId}`);
       toast.success("Room deleted successfully")
       router.replace("/dashboard")
-    } catch (error) {
-      console.error(error);
+    } catch (error: any) {
+      toast.error(error.message);
     }
   };
 

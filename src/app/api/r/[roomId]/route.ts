@@ -9,6 +9,7 @@ import { ObjectId } from "mongodb";
 import { apiHandler } from "@/utils/ApiHandler";
 import { ApiError } from "@/utils/ApiError";
 import { ApiResponse } from "@/utils/ApiResponse";
+import { pusherServer } from "@/lib/pusher";
 
 export function getIpHash(request: NextRequest) {
     const ip = ipAddress(request) ?? "unknown";
@@ -51,31 +52,35 @@ export const GET = apiHandler(async (request: NextRequest, { params }: {
     );
 });
 
-export const POST = apiHandler(async (request: NextRequest, { params }: {
-    params: Promise<{ roomId: string }>
-}) => {
-    await dbconnect();
-    const body = await request.json();
-    const { roomId } = await params;
+    export const POST = apiHandler(async (request: NextRequest, { params }: {
+        params: Promise<{ roomId: string }>
+    }) => {
+        await dbconnect();
+        const body = await request.json();
+        const { roomId } = await params;
 
-    if (!roomId) {
-        throw new ApiError(400, "Room id is required");
-    }
-    if (!body.textReview) {
-        throw new ApiError(400, "Review text is required");
-    }
+        if (!roomId) {
+            throw new ApiError(400, "Room id is required");
+        }
+        if (!body.textReview) {
+            throw new ApiError(400, "Review text is required");
+        }
 
-    const ipHash = getIpHash(request);
-    const review = await Review.create({
-        textReview: body.textReview,
-        roomId,
-        ipHash,
+        const ipHash = getIpHash(request);
+        const review = await Review.create({
+            textReview: body.textReview,
+            roomId,
+            ipHash,
+        });
+
+        const updatedRoom = await Room.findByIdAndUpdate(roomId, { $push: { reviews: review._id } });
+        if (!updatedRoom) {
+            throw new ApiError(404, "Room not found");
+        }
+
+        await pusherServer.trigger(`private-${updatedRoom.username}`, "new-review", {
+            review,
+        });
+
+        return NextResponse.json(new ApiResponse(201, review), { status: 201 });
     });
-
-    const updatedRoom = await Room.findByIdAndUpdate(roomId, { $push: { reviews: review._id } });
-    if (!updatedRoom) {
-        throw new ApiError(500, "Failed to attach review to room");
-    }
-
-    return NextResponse.json(new ApiResponse(201, review), { status: 201 });
-});

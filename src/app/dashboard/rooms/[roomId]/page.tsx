@@ -11,6 +11,8 @@ import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import Review from "@/components/Review"
 import { toast } from "sonner";
+import { pusherClient } from "@/lib/pusherClient";
+import { IReview } from "@/models/review.model";
 
 type Room = {
   creator: any[],
@@ -23,7 +25,7 @@ type Room = {
 export default function Page() {
   const [room, setRoom] = useState<Room | null>();
   const roomId = useParams<{ roomId: string }>().roomId;
-  const [reviews, setReviews] = useState([]);
+  const [reviews, setReviews] = useState<IReview[]>([]);
   const [loading, setLoading] = useState(true);
   const [copied, setCopied] = useState(false);
   const [roomUrl, setRoomUrl] = useState("")
@@ -52,6 +54,20 @@ export default function Page() {
 
     getRoom();
   }, [roomId])
+
+  useEffect(() => {
+    if (!room?.username) return;
+
+    const channel = pusherClient.subscribe(`private-${room.username}`);
+    channel.bind("new-review", (data: { review: any }) => {
+      setReviews((prev: any[]) => [data.review, ...prev]);
+    });
+
+    return () => {
+      channel.unbind("new-review");
+      pusherClient.unsubscribe(`private-${room.username}`);
+    };
+  }, [room?.username]);
 
   const handleCopy = async () => {
     try {

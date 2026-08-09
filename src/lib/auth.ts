@@ -7,6 +7,18 @@ import { emailOTP } from "better-auth/plugins"
 const client = new MongoClient(process.env.MONGODB_URI!);
 export const db = client.db();
 
+db.collection("user")
+  .createIndex(
+    { name: 1 },
+    { unique: true, collation: { locale: "en", strength: 2 } }
+  )
+  .catch((error) => {
+    console.error(
+      "Failed to create unique index on user.name — check for existing duplicate names",
+      error
+    );
+  });
+
 export const auth = betterAuth({
   database: mongodbAdapter(db, {
     client

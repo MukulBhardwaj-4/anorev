@@ -16,8 +16,7 @@ export const POST = apiHandler(async (request: NextRequest) => {
     }
 
     const existingUser = await db.collection("user").findOne({
-        name: username,
-        emailVerified: true,
+        name: username.trim(),
     });
 
     if (existingUser) {

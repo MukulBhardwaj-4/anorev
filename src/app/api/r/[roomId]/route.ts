@@ -52,35 +52,47 @@ export const GET = apiHandler(async (request: NextRequest, { params }: {
     );
 });
 
-    export const POST = apiHandler(async (request: NextRequest, { params }: {
-        params: Promise<{ roomId: string }>
-    }) => {
-        await dbconnect();
-        const body = await request.json();
-        const { roomId } = await params;
+export const POST = apiHandler(async (request: NextRequest, { params }: {
+    params: Promise<{ roomId: string }>
+}) => {
+    await dbconnect();
+    const body = await request.json();
+    const { roomId } = await params;
 
-        if (!roomId) {
-            throw new ApiError(400, "Room id is required");
-        }
-        if (!body.textReview) {
-            throw new ApiError(400, "Review text is required");
-        }
+    if (!roomId) {
+        throw new ApiError(400, "Room id is required");
+    }
+    if (!body.textReview || typeof body.textReview !== "string" || !body.textReview.trim()) {
+        throw new ApiError(400, "Review text is required");
+    }
 
-        const ipHash = getIpHash(request);
-        const review = await Review.create({
-            textReview: body.textReview,
+    if (body.textReview.length > 500) {
+        throw new ApiError(400, "Review text must be at most 500 characters");
+    }
+
+    const ipHash = getIpHash(request);
+    let review;
+    try {
+        review = await Review.create({
+            textReview: body.textReview.trim(),
             roomId,
             ipHash,
         });
-
-        const updatedRoom = await Room.findByIdAndUpdate(roomId, { $push: { reviews: review._id } });
-        if (!updatedRoom) {
-            throw new ApiError(404, "Room not found");
+    } catch (error: any) {
+        if (error?.code === 11000) {
+            throw new ApiError(409, "You have already reviewed this room");
         }
+        throw error;
+    }
 
-        await pusherServer.trigger(`private-${updatedRoom.username}`, "new-review", {
-            review,
-        });
+    const updatedRoom = await Room.findByIdAndUpdate(roomId, { $push: { reviews: review._id } });
+    if (!updatedRoom) {
+        throw new ApiError(404, "Room not found");
+    }
 
-        return NextResponse.json(new ApiResponse(201, review), { status: 201 });
+    await pusherServer.trigger(`private-${roomId}`, "new-review", {
+        review,
     });
+
+    return NextResponse.json(new ApiResponse(201, review), { status: 201 });
+});

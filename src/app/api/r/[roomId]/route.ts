@@ -90,7 +90,7 @@ export const POST = apiHandler(async (request: NextRequest, { params }: {
         throw new ApiError(404, "Room not found");
     }
 
-    await pusherServer.trigger(`private-${roomId}`, "new-review", {
+    await pusherServer.trigger(`private-${room.username}`, "new-review", {
         review,
     });
 

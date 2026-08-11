@@ -58,14 +58,14 @@ export default function Page() {
   useEffect(() => {
     if (!roomId) return;
 
-    const channel = pusherClient.subscribe(`private-${room.username}`);
+    const channel = pusherClient.subscribe(`private-${room?.username}`);
     channel.bind("new-review", (data: { review: any }) => {
       setReviews((prev: any[]) => [data.review, ...prev]);
     });
 
     return () => {
       channel.unbind("new-review");
-      pusherClient.unsubscribe(`private-${room.username}`);
+      pusherClient.unsubscribe(`private-${room?.username}`);
     };
   }, [room?.username]);
 

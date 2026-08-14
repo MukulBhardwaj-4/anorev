@@ -9,7 +9,8 @@ export async function proxy(request: NextRequest) {
     const url = request.nextUrl
     if(session && session.user.emailVerified &&(
         url.pathname.startsWith("/signin") ||
-        url.pathname.startsWith("/signup")
+        url.pathname.startsWith("/signup") ||
+        url.pathname.startsWith("/verifyEmail")
     )){
         return NextResponse.redirect(new URL('/dashboard', request.url))
     }

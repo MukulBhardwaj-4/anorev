@@ -29,7 +29,7 @@ export function RoomCard({
     router.push(`/dashboard/rooms/${id}`)
   }
   return (
-    <Card className="h-full w-full min-h-50 flex flex-col overflow-hidden">
+    <Card className="group h-full w-full min-h-[200px] flex flex-col overflow-hidden border-border transition-all hover:-translate-y-0.5 hover:border-primary/40 hover:shadow-md">
       <CardHeader className="pb-2">
         <div className="flex mb-2 flex-wrap items-center justify-between gap-x-2 gap-y-1 text-xs text-muted-foreground">
           <span className="truncate">
@@ -39,18 +39,18 @@ export function RoomCard({
               day: "numeric",
             })}
           </span>
-          <span className="flex shrink-0 items-center gap-1">
+          <span className="flex shrink-0 items-center gap-1 rounded-full bg-accent px-2 py-0.5 text-accent-foreground">
             <Star className="h-3 w-3 fill-current" />
             {reviewCount}
           </span>
         </div>
-        <CardTitle className="text-lg pt-1 line-clamp-2">
+        <CardTitle className="text-lg pt-1 line-clamp-2 transition-colors group-hover:text-primary">
           {title}
         </CardTitle>
       </CardHeader>
       <CardContent className="flex-1" />
       <CardFooter>
-        <Button onClick={handleCheck} className="w-full">Check</Button>
+        <Button onClick={handleCheck} variant="outline" className="w-full group-hover:border-primary/50 group-hover:bg-primary group-hover:text-primary-foreground">Check</Button>
       </CardFooter>
     </Card>
   )

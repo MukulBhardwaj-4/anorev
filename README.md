@@ -1,4 +1,3 @@
-```markdown
 # anorev
 
 **Honest feedback. Hidden identities.**
@@ -39,42 +38,36 @@ anorev is an anonymous review platform. Create a room for anything that needs fe
 
 ### 1. Clone and install
 
-```bash
-git clone <repo-url>
-cd webdev
-npm install
-```
+    git clone <repo-url>
+    cd webdev
+    npm install
 
 ### 2. Configure environment variables
 
 Create a `.env` file in the project root:
 
-```bash
-# Auth
-BETTER_AUTH_SECRET=
-BETTER_AUTH_URL=http://localhost:3000
+    # Auth
+    BETTER_AUTH_SECRET=
+    BETTER_AUTH_URL=http://localhost:3000
 
-# Database
-MONGODB_URI=
+    # Database
+    MONGODB_URI=
 
-# Email (Resend)
-RESEND_API_KEY=
+    # Email (Resend)
+    RESEND_API_KEY=
 
-# Realtime (Pusher)
-PUSHER_APP_ID=
-NEXT_PUBLIC_PUSHER_KEY=
-PUSHER_SECRET=
-NEXT_PUBLIC_PUSHER_CLUSTER=
+    # Realtime (Pusher)
+    PUSHER_APP_ID=
+    NEXT_PUBLIC_PUSHER_KEY=
+    PUSHER_SECRET=
+    NEXT_PUBLIC_PUSHER_CLUSTER=
 
-# Cron job auth (see below)
-CRON_SECRET=
-```
+    # Cron job auth (see below)
+    CRON_SECRET=
 
 ### 3. Run the dev server
 
-```bash
-npm run dev
-```
+    npm run dev
 
 Open [http://localhost:3000](http://localhost:3000).
 
@@ -89,22 +82,20 @@ Open [http://localhost:3000](http://localhost:3000).
 
 ## Project structure
 
-```
-src/
-├── app/
-│   ├── api/                 # Route handlers (rooms, reviews, auth, pusher, cron)
-│   ├── dashboard/            # Authenticated creator dashboard
-│   │   ├── create/            # Create-room form
-│   │   └── rooms/[roomId]/     # Room detail + reviews
-│   ├── r/[roomId]/            # Public, anonymous review page
-│   ├── signin/, signup/        # Auth pages
-│   └── verifyEmail/             # OTP verification page
-├── components/                # Shared UI (Navbar, RoomCard, Review, ui/*)
-├── config/                    # DB + Resend client setup
-├── lib/                       # auth, pusher clients, utils
-├── models/                    # Mongoose schemas (room, review)
-└── utils/                     # API client + response/error helpers
-```
+    src/
+    ├── app/
+    │   ├── api/                 # Route handlers (rooms, reviews, auth, pusher, cron)
+    │   ├── dashboard/            # Authenticated creator dashboard
+    │   │   ├── create/            # Create-room form
+    │   │   └── rooms/[roomId]/     # Room detail + reviews
+    │   ├── r/[roomId]/            # Public, anonymous review page
+    │   ├── signin/, signup/        # Auth pages
+    │   └── verifyEmail/             # OTP verification page
+    ├── components/                # Shared UI (Navbar, RoomCard, Review, ui/*)
+    ├── config/                    # DB + Resend client setup
+    ├── lib/                       # auth, pusher clients, utils
+    ├── models/                    # Mongoose schemas (room, review)
+    └── utils/                     # API client + response/error helpers
 
 ## How it works
 

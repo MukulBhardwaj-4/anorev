@@ -70,8 +70,8 @@ export default function page() {
     }
     else if (!checked) {
         return (
-            <div className="flex justify-center items-center h-screen w-screen">
-                <h2 className="scroll-m-20 border-b pb-2 text-3xl font-semibold tracking-tight first:mt-0">
+            <div className="flex min-h-screen w-full items-center justify-center px-4 text-center">
+                <h2 className="scroll-m-20 border-b pb-2 text-2xl font-semibold tracking-tight first:mt-0 sm:text-3xl">
                     The creator is currently not accepting reviews
                 </h2>
             </div>
@@ -79,8 +79,8 @@ export default function page() {
     }
     else if (!roomFound) {
         return (
-            <div className="flex justify-center items-center h-screen w-screen">
-                <h2 className="scroll-m-20 border-b pb-2 text-3xl font-semibold tracking-tight first:mt-0">
+            <div className="flex min-h-screen w-full items-center justify-center px-4 text-center">
+                <h2 className="scroll-m-20 border-b pb-2 text-2xl font-semibold tracking-tight first:mt-0 sm:text-3xl">
                     Room not found
                 </h2>
             </div>
@@ -88,8 +88,8 @@ export default function page() {
     }
     else if (submitted) {
         return (
-            <div className="flex justify-center items-center h-screen w-screen">
-                <h2 className="scroll-m-20 border-b pb-2 text-3xl font-semibold tracking-tight first:mt-0">
+            <div className="flex min-h-screen w-full items-center justify-center px-4 text-center">
+                <h2 className="scroll-m-20 border-b pb-2 text-2xl font-semibold tracking-tight first:mt-0 sm:text-3xl">
                     Review Submitted successfully
                 </h2>
             </div>
@@ -98,11 +98,11 @@ export default function page() {
     else {
         return (
             <div>
-                <div className="container max-w-4xl mx-auto py-10 space-y-10">
+                <div className="container max-w-4xl mx-auto space-y-8 px-4 py-8 sm:space-y-10 sm:px-6 sm:py-10">
                     <Card>
                         <CardHeader>
-                            <div className="flex items-start justify-between gap-4">
-                                <CardTitle className="text-2xl">Review Request</CardTitle>
+                            <div className="flex flex-wrap items-start justify-between gap-4">
+                                <CardTitle className="text-xl sm:text-2xl">Review Request</CardTitle>
                                 <div className="text-right opacity-60">
                                     <p className="text-xs font-medium uppercase tracking-wide">Creator</p>
                                     <p className="text-sm">{room?.username}</p>

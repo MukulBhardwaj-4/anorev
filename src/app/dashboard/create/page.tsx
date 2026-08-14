@@ -63,11 +63,11 @@ export default function page() {
     )
   }
   return (
-    <div className='flex flex-1 flex-col items-center px-15 py-5'>
+    <div className='flex flex-1 flex-col items-center px-4 py-8 sm:px-8 sm:py-10 lg:px-15'>
       <div>
-        <h1 className='text-4xl text-center'>Create Room</h1>
+        <h1 className='text-3xl text-center sm:text-4xl'>Create Room</h1>
       </div>
-      <div className="mt-10 flex w-full max-w-xl flex-col">
+      <div className="mt-8 flex w-full max-w-xl flex-col sm:mt-10">
         <form onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col gap-6">
           <Field className="mb-5">
             <FieldLabel className="text-xl" htmlFor="input-badge">Content URL</FieldLabel>

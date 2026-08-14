@@ -75,17 +75,17 @@ export default function InputOTPForm() {
     )
   }
   return (
-    <div className="flex min-h-screen items-center ">
-      <Card className="mx-auto max-w-md">
+    <div className="flex min-h-screen items-center justify-center px-4">
+      <Card className="w-full max-w-md">
         <CardHeader>
           <CardTitle>Verify your login</CardTitle>
-          <CardDescription>
-            Enter the verification code we sent to your email address : {session.data?.user.email}
+          <CardDescription className="wrap-break-word">
+            Enter the verification code we sent to your email address: {session.data?.user.email}
           </CardDescription>
         </CardHeader>
         <CardContent>
           <Field>
-            <div className="flex items-center justify-between">
+            <div className="flex flex-wrap items-center justify-between gap-2">
               <FieldLabel htmlFor="otp-verification">
                 Verification code
               </FieldLabel>
@@ -94,14 +94,14 @@ export default function InputOTPForm() {
                 Resend Code
               </Button>
             </div>
-            <InputOTP onChange={(otpValue) => setOtpValue(otpValue)} maxLength={6} id="otp-verification" required>
-              <InputOTPGroup className="*:data-[slot=input-otp-slot]:h-12 *:data-[slot=input-otp-slot]:w-11 *:data-[slot=input-otp-slot]:text-xl">
+            <InputOTP onChange={(otpValue) => setOtpValue(otpValue)} maxLength={6} id="otp-verification" required containerClassName="justify-center sm:justify-start">
+              <InputOTPGroup className="*:data-[slot=input-otp-slot]:h-11 *:data-[slot=input-otp-slot]:w-9 *:data-[slot=input-otp-slot]:text-lg sm:*:data-[slot=input-otp-slot]:h-12 sm:*:data-[slot=input-otp-slot]:w-11 sm:*:data-[slot=input-otp-slot]:text-xl">
                 <InputOTPSlot index={0} />
                 <InputOTPSlot index={1} />
                 <InputOTPSlot index={2} />
               </InputOTPGroup>
-              <InputOTPSeparator className="mx-2" />
-              <InputOTPGroup className="*:data-[slot=input-otp-slot]:h-12 *:data-[slot=input-otp-slot]:w-11 *:data-[slot=input-otp-slot]:text-xl">
+              <InputOTPSeparator className="mx-1 sm:mx-2" />
+              <InputOTPGroup className="*:data-[slot=input-otp-slot]:h-11 *:data-[slot=input-otp-slot]:w-9 *:data-[slot=input-otp-slot]:text-lg sm:*:data-[slot=input-otp-slot]:h-12 sm:*:data-[slot=input-otp-slot]:w-11 sm:*:data-[slot=input-otp-slot]:text-xl">
                 <InputOTPSlot index={3} />
                 <InputOTPSlot index={4} />
                 <InputOTPSlot index={5} />

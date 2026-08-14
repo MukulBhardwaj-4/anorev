@@ -29,21 +29,19 @@ export function RoomCard({
     router.push(`/dashboard/rooms/${id}`)
   }
   return (
-    <Card className="w-[320px] h-50 flex flex-col overflow-hidden">
+    <Card className="h-full w-full min-h-50 flex flex-col overflow-hidden">
       <CardHeader className="pb-2">
-        <div className="flex mb-2 items-center justify-between text-xs text-muted-foreground">
-          <span>
-            {creatorName} - {new Date(uploadedAt).toLocaleDateString("en-US", {
+        <div className="flex mb-2 flex-wrap items-center justify-between gap-x-2 gap-y-1 text-xs text-muted-foreground">
+          <span className="truncate">
+            {creatorName} · {new Date(uploadedAt).toLocaleDateString("en-US", {
               year: "numeric",
               month: "short",
               day: "numeric",
-              hour: "numeric",
-              minute: "2-digit",
             })}
           </span>
-          <span className="flex items-center gap-1">
+          <span className="flex shrink-0 items-center gap-1">
             <Star className="h-3 w-3 fill-current" />
-            {reviewCount} reviews
+            {reviewCount}
           </span>
         </div>
         <CardTitle className="text-lg pt-1 line-clamp-2">

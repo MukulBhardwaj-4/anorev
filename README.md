@@ -1,36 +1,122 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+```markdown
+# anorev
 
-## Getting Started
+**Honest feedback. Hidden identities.**
 
-First, run the development server:
+anorev is an anonymous review platform. Create a room for anything that needs feedback — a design, a draft, a pitch deck — share one link, and let anyone leave exactly one anonymous review. No reviewer accounts, no sign-in, no friction.
+
+## Features
+
+- 🔗 **One link, one room** — paste a content URL and description, get a shareable review link
+- 🕶️ **Fully anonymous reviews** — no reviewer accounts or names attached
+- ✅ **One review per person** — lightweight duplicate-submission checks per room
+- ⚡ **Live updates** — new reviews stream into the dashboard in real time via Pusher
+- 🔐 **Email/OTP authentication** — sign up, verify by email, sign in with [better-auth](https://www.better-auth.com/)
+- 🎛️ **Accepting-messages toggle** — creators can pause incoming reviews on any room
+- 🧹 **Scheduled cleanup** — a daily cron job removes stale unverified accounts
+
+## Tech stack
+
+| Layer      | Choice                                              |
+|------------|------------------------------------------------------|
+| Framework  | [Next.js 16](https://nextjs.org) (App Router)         |
+| UI         | React 19, Tailwind CSS v4, shadcn/ui, Radix primitives |
+| Auth       | better-auth (email OTP)                                |
+| Database   | MongoDB via Mongoose                                    |
+| Realtime   | Pusher                                                   |
+| Email      | Resend + React Email                                     |
+| Forms      | react-hook-form + Zod                                     |
+| Deployment | Vercel (with a scheduled cron job)                          |
+
+## Getting started
+
+### Prerequisites
+
+- Node.js 18+
+- A MongoDB database (e.g. [MongoDB Atlas](https://www.mongodb.com/atlas))
+- A [Pusher](https://pusher.com/) app (for live review updates)
+- A [Resend](https://resend.com/) account (for verification emails)
+
+### 1. Clone and install
+
+```bash
+git clone <repo-url>
+cd webdev
+npm install
+```
+
+### 2. Configure environment variables
+
+Create a `.env` file in the project root:
+
+```bash
+# Auth
+BETTER_AUTH_SECRET=
+BETTER_AUTH_URL=http://localhost:3000
+
+# Database
+MONGODB_URI=
+
+# Email (Resend)
+RESEND_API_KEY=
+
+# Realtime (Pusher)
+PUSHER_APP_ID=
+NEXT_PUBLIC_PUSHER_KEY=
+PUSHER_SECRET=
+NEXT_PUBLIC_PUSHER_CLUSTER=
+
+# Cron job auth (see below)
+CRON_SECRET=
+```
+
+### 3. Run the dev server
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000).
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Available scripts
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+| Command         | Description                       |
+|-----------------|------------------------------------|
+| `npm run dev`   | Start the development server        |
+| `npm run build` | Build for production                 |
+| `npm run start` | Run the production build              |
+| `npm run lint`  | Run ESLint                             |
 
-## Learn More
+## Project structure
 
-To learn more about Next.js, take a look at the following resources:
+```
+src/
+├── app/
+│   ├── api/                 # Route handlers (rooms, reviews, auth, pusher, cron)
+│   ├── dashboard/            # Authenticated creator dashboard
+│   │   ├── create/            # Create-room form
+│   │   └── rooms/[roomId]/     # Room detail + reviews
+│   ├── r/[roomId]/            # Public, anonymous review page
+│   ├── signin/, signup/        # Auth pages
+│   └── verifyEmail/             # OTP verification page
+├── components/                # Shared UI (Navbar, RoomCard, Review, ui/*)
+├── config/                    # DB + Resend client setup
+├── lib/                       # auth, pusher clients, utils
+├── models/                    # Mongoose schemas (room, review)
+└── utils/                     # API client + response/error helpers
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## How it works
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+1. **Create a room** — a signed-in user pastes a content URL and description
+2. **Share the link** — each room gets a public review link at `/r/[roomId]`
+3. **Collect reviews** — visitors open the link and submit one anonymous review; the creator's dashboard updates live via Pusher
+4. **Manage rooms** — creators can toggle whether a room is accepting new reviews, or delete it entirely
 
-## Deploy on Vercel
+## Scheduled jobs
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+A Vercel cron job hits `/api/cron` daily (`vercel.json`) to delete accounts that never verified their email within 24 hours. The endpoint is protected by the `CRON_SECRET` environment variable via a bearer token.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Deployment
+
+The easiest way to deploy is [Vercel](https://vercel.com/new), which will also pick up the cron schedule in `vercel.json` automatically. Make sure all environment variables above are set in your Vercel project settings.

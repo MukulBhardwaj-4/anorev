@@ -55,7 +55,7 @@ export function Navbar() {
 
   return (
     <div className="flex sticky z-20 border-b border-border bg-background/85 backdrop-blur-sm flex-col w-full">
-      <div className="flex items-center justify-between px-15 py-2">  
+      <div className="flex items-center justify-between px-4 py-2 sm:px-8 lg:px-15">  
         <Link href="/dashboard" className="flex items-center gap-2.5 font-medium">
           <span className="block h-2.5 w-5 rounded-sm bg-foreground" />
           <span className="font-mono text-base tracking-tight">
@@ -67,12 +67,6 @@ export function Navbar() {
             <Button className="bg-gray-950 text-white">☰</Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent>
-            <DropdownMenuGroup>
-              <DropdownMenuItem>
-                <Link href={"/dashboard/create"}>Create Room</Link>
-              </DropdownMenuItem>
-            </DropdownMenuGroup>
-            <DropdownMenuSeparator />
             <DropdownMenuItem onClick={handleLogout}>Sign out</DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>

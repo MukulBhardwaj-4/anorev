@@ -100,11 +100,11 @@ export default function Page() {
   else {
     return (
       <div>
-        <div className="container max-w-4xl mx-auto py-10 space-y-10">
+        <div className="container max-w-4xl mx-auto space-y-8 px-4 py-8 sm:space-y-10 sm:px-6 sm:py-10">
           <Card>
             <CardHeader>
-              <div className="flex items-start justify-between gap-4">
-                <CardTitle className="text-2xl">Review Request</CardTitle>
+              <div className="flex flex-wrap items-start justify-between gap-4">
+                <CardTitle className="text-xl sm:text-2xl">Review Request</CardTitle>
                 <div className="text-right opacity-60">
                   <Button
                     onClick={handleDeleteRoom}

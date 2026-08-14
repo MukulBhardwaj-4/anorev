@@ -29,7 +29,7 @@ export function RoomCard({
     router.push(`/dashboard/rooms/${id}`)
   }
   return (
-    <Card className="group h-full w-full min-h-[200px] flex flex-col overflow-hidden border-border transition-all hover:-translate-y-0.5 hover:border-primary/40 hover:shadow-md">
+    <Card className="group h-full w-full min-h-50 flex flex-col overflow-hidden border-border transition-all hover:-translate-y-0.5 hover:border-primary/40 hover:shadow-md">
       <CardHeader className="pb-2">
         <div className="flex mb-2 flex-wrap items-center justify-between gap-x-2 gap-y-1 text-xs text-muted-foreground">
           <span className="truncate">

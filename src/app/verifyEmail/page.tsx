@@ -1,5 +1,5 @@
 "use client"
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
 import { toast } from "sonner"
 import { authClient } from "@/lib/auth-client"
@@ -24,10 +24,22 @@ import {
   InputOTPSlot,
 } from "@/components/ui/input-otp"
 
+const RESEND_COOLDOWN_SECONDS = 120
+
 export default function InputOTPForm() {
   const router = useRouter()
   const session = authClient.useSession()
   const [loading, setLoading] = useState(false)
+  const [resendCooldown, setResendCooldown] = useState(0)
+
+  useEffect(() => {
+    if (resendCooldown <= 0) return
+    const timer = setInterval(() => {
+      setResendCooldown((prev) => (prev <= 1 ? 0 : prev - 1))
+    }, 1000)
+    return () => clearInterval(timer)
+  }, [resendCooldown])
+
   const handleSubmit = async () => {
     setLoading(true)
     try {
@@ -42,12 +54,16 @@ export default function InputOTPForm() {
     } catch (error) {
       console.log(error);
       throw new Error("Failed to send verification email")
-    } finally{
+    } finally {
       setLoading(false)
     }
   }
 
   const handleResend = async () => {
+    if (resendCooldown > 0) {
+      toast.error(`Please wait ${resendCooldown}s before requesting another code`)
+      return
+    }
     setLoading(true)
     try {
       const { data, error } = await authClient.emailOtp.sendVerificationOtp({
@@ -57,11 +73,10 @@ export default function InputOTPForm() {
       if (!error) {
         toast.success("Otp sent succesfully")
       }
+      router.push("/dashboard");
     } catch (error) {
       console.log(error)
       throw new Error("Error while resending the email")
-    } finally {
-      setLoading(false)
     }
   }
 

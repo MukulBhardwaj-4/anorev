@@ -27,6 +27,17 @@ export const auth = betterAuth({
     enabled: true,
     
   },
+    rateLimit: {
+    enabled: true,
+    window: 60,
+    max: 100,
+    customRules: {
+      "/email-otp/send-verification-otp": {
+        window: 120,
+        max: 1,
+      },
+    },
+  },
   session: {
     cookieCache: {
       enabled: true,

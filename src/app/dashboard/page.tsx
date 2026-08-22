@@ -78,6 +78,14 @@ export default function Page() {
               </h1>
             </div>
             <div className="flex flex-wrap items-center gap-3">
+              {roomData.length > 0 && (
+                <Button asChild variant="outline">
+                  <Link href="/dashboard/create">
+                    <Plus className="h-4 w-4" />
+                    Create a room
+                  </Link>
+                </Button>
+              )}
               <div className="flex items-center gap-3 rounded-xl border border-border bg-card px-4 py-2.5 shadow-sm">
                 <Switch checked={checked} onCheckedChange={handleToggle} id="accepting-msg" />
                 <Label htmlFor="accepting-msg" className="cursor-pointer text-sm font-medium">

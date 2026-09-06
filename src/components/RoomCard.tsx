@@ -50,7 +50,7 @@ export function RoomCard({
       </CardHeader>
       <CardContent className="flex-1" />
       <CardFooter>
-        <Button onClick={handleCheck} variant="outline" className="w-full group-hover:border-primary/50 group-hover:bg-primary group-hover:text-primary-foreground">Check</Button>
+        {/* <Button onClick={handleCheck} variant="outline" className="w-full group-hover:border-primary/50 group-hover:bg-primary group-hover:text-primary-foreground">Check</Button> */}
       </CardFooter>
     </Card>
   )

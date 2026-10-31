@@ -7,8 +7,6 @@ import { ApiError } from "@/utils/ApiError";
 import { ApiResponse } from "@/utils/ApiResponse";
 
 export const GET = apiHandler(async (request: NextRequest) => {
-    await dbconnect();
-
     const session = await auth.api.getSession({ headers: request.headers });
     if (!session?.user) {
         throw new ApiError(401, "Unauthorized");

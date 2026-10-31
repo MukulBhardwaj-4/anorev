@@ -34,4 +34,6 @@ const roomSchema = new mongoose.Schema<IRoom>({
     ],
 },{timestamps: true})
 
+roomSchema.index({ creator: 1 })
+
 export const Room = mongoose.models.Room || mongoose.model("Room", roomSchema)

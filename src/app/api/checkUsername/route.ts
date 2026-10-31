@@ -1,4 +1,3 @@
-import dbconnect from "@/config/dbconnect";
 import { db } from "@/lib/auth";
 import { NextRequest, NextResponse } from "next/server";
 import { apiHandler } from "@/utils/ApiHandler";
@@ -6,8 +5,6 @@ import { ApiError } from "@/utils/ApiError";
 import { ApiResponse } from "@/utils/ApiResponse";
 
 export const POST = apiHandler(async (request: NextRequest) => {
-    await dbconnect();
-
     const body = await request.json();
     const username = body?.username;
 

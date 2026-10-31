@@ -2,7 +2,7 @@ import dbconnect from "@/config/dbconnect";
 import { Review } from "@/models/review.model";
 import { Room } from "@/models/room.model";
 import { createHash } from "crypto";
-import { NextRequest, NextResponse } from "next/server";
+import { after, NextRequest, NextResponse } from "next/server";
 import { ipAddress } from "@vercel/functions";
 import { db } from "@/lib/auth";
 import { ObjectId } from "mongodb";
@@ -26,28 +26,17 @@ export const GET = apiHandler(async (request: NextRequest, { params }: {
         throw new ApiError(400, "Room id is required");
     }
 
-    const room = await Room.findById(roomId).select("username description contentUrl creator");
-    if (!room) {
-        throw new ApiError(404, "Room not found");
-    }
-
-    let isAcceptingMessages = false;
-    try {
-        const creator = await db.collection("user").findOne({ _id: new ObjectId(room.creator) });
-        isAcceptingMessages = !!creator?.isAcceptingMessages;
-    } catch (error) {
-        console.error("Error fetching creator accept-message status", error);
-    }
+    const room = await Room.findById(roomId).select("username description contentUrl creator").lean();
+    if (!room) throw new ApiError(404, "Room not found");
 
     const ipHash = getIpHash(request);
-    const existingReview = await Review.findOne({ roomId, ipHash });
+    const [creator, existingReview] = await Promise.all([
+        db.collection("user").findOne({ _id: new ObjectId(room.creator) }, { projection: { isAcceptingMessages: 1 } }),
+        Review.exists({ roomId, ipHash }),
+    ]);
 
     return NextResponse.json(
-        new ApiResponse(200, {
-            ...room.toObject(),
-            hasReviewed: !!existingReview,
-            isAcceptingMessages,
-        }),
+        new ApiResponse(200, { ...room, hasReviewed: !!existingReview, isAcceptingMessages: !!creator?.isAcceptingMessages }),
         { status: 200 }
     );
 });
@@ -90,9 +79,7 @@ export const POST = apiHandler(async (request: NextRequest, { params }: {
         throw new ApiError(404, "Room not found");
     }
 
-    await pusherServer.trigger(`private-${updatedRoom.username}`, "new-review", {
-        review,
-    });
+    after(() => pusherServer.trigger(`private-${updatedRoom.username}`, "new-review", { review }));
 
     return NextResponse.json(new ApiResponse(201, review), { status: 201 });
 });

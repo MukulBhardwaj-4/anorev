@@ -57,7 +57,7 @@ export default function Page() {
 
   useEffect(() => {
     if (!roomId) return;
-
+    if(!room?.username) return;
     const channel = pusherClient.subscribe(`private-${room?.username}`);
     channel.bind("new-review", (data: { review: any }) => {
       setReviews((prev: any[]) => [data.review, ...prev]);

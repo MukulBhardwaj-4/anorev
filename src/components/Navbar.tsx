@@ -41,6 +41,7 @@ export function Navbar() {
       toast.error("Failed to sign out")
       console.log(error)
     } finally {
+      setLoading(false)
     }
   }
 

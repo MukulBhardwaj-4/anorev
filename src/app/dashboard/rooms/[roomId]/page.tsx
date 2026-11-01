@@ -2,7 +2,7 @@
 
 import { api } from "@/utils/ApiClient";
 import { useRouter } from "next/navigation";
-import { Loader2, Copy, Check, ExternalLink, Trash2 } from "lucide-react"
+import { Loader2, Copy, Check, ExternalLink, Trash2, Sparkles } from "lucide-react"
 import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle, } from "@/components/ui/card";
@@ -13,6 +13,7 @@ import Review from "@/components/Review"
 import { toast } from "sonner";
 import { pusherClient } from "@/lib/pusherClient";
 import { IReview } from "@/models/review.model";
+import { SummarizeModal } from "@/components/SummarizeModal";
 
 type Room = {
   creator: any[],
@@ -29,6 +30,10 @@ export default function Page() {
   const [loading, setLoading] = useState(true);
   const [copied, setCopied] = useState(false);
   const [roomUrl, setRoomUrl] = useState("")
+  const [summarizeOpen, setSummarizeOpen] = useState(false);
+  const [summary, setSummary] = useState<string | null>(null);
+  const [summarizing, setSummarizing] = useState(false);
+  const [summaryError, setSummaryError] = useState<string | null>(null);
 
   const router = useRouter()
 
@@ -86,6 +91,44 @@ export default function Page() {
       router.replace("/dashboard")
     } catch (error: any) {
       toast.error(error.message);
+    }
+  };
+
+  const handleSummarize = async () => {
+    if (reviews.length === 0) {
+      toast.error("No reviews to summarize");
+      return;
+    }
+
+    setSummarizing(true);
+    setSummaryError(null);
+    setSummary(null);
+    setSummarizeOpen(true);
+
+    try {
+      const reviewTexts = reviews.map((review: any) => review.textReview);
+      const response = await fetch("/api/summarize", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ reviews: reviewTexts }),
+      });
+
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.error || "Failed to summarize reviews");
+      }
+
+      const data = await response.json();
+      setSummary(data.summary);
+      toast.success("Summary generated successfully");
+    } catch (error: any) {
+      setSummaryError(error.message);
+      toast.error("Failed to generate summary");
+      console.error("Summarization error:", error);
+    } finally {
+      setSummarizing(false);
     }
   };
 
@@ -160,7 +203,25 @@ export default function Page() {
           </Card>
           <Separator />
           <section className="space-y-6">
-            <h2 className="text-2xl font-semibold">Reviews</h2>
+            <div className="flex items-center justify-between">
+              <h2 className="text-2xl font-semibold">Reviews</h2>
+              {reviews.length > 0 && (
+                <Button
+                  onClick={handleSummarize}
+                  disabled={summarizing}
+                  variant="outline"
+                  size="sm"
+                  className="gap-2"
+                >
+                  {summarizing ? (
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                  ) : (
+                    <Sparkles className="h-4 w-4" />
+                  )}
+                  Summarize
+                </Button>
+              )}
+            </div>
             {reviews.length === 0 ? (
               <p className="text-sm text-muted-foreground">
                 No reviews yet.
@@ -173,6 +234,14 @@ export default function Page() {
               </div>
             )}
           </section>
+
+          <SummarizeModal
+            open={summarizeOpen}
+            onOpenChange={setSummarizeOpen}
+            summary={summary}
+            loading={summarizing}
+            error={summaryError}
+          />
         </div>
       </div>
     )

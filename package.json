@@ -9,14 +9,17 @@
     "lint": "eslint"
   },
   "dependencies": {
+    "@ai-sdk/google": "^4.0.109",
     "@hookform/resolvers": "^5.2.2",
     "@react-email/components": "^1.0.12",
     "@react-email/render": "^2.0.6",
     "@vercel/functions": "^3.7.4",
+    "ai": "^7.0.159",
     "axios": "^1.18.1",
     "better-auth": "^1.6.2",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
+    "cn": "^0.5.1",
     "input-otp": "^1.4.2",
     "lucide-react": "^1.8.0",
     "mongodb": "^7.1.1",

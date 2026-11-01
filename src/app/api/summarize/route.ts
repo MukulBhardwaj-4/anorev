@@ -18,17 +18,17 @@ export async function POST(request: Request) {
 
     const { text } = await generateText({
       model: google('gemini-2.5-flash'),
-      prompt: `Please provide a concise and comprehensive summary of the following reviews.
+      prompt: `Summarize the following anonymous reviews in under 120 words.
 
-Highlight the key themes, most common feedback, strengths, and areas for improvement.
-Format the summary in a clear, readable way with sections for:
-- Overall Sentiment
-- Key Strengths
-- Areas for Improvement
-- Common Themes
-- Recommendations
+Use this format:
+**Overall:** one sentence on the general sentiment.
+**Strengths:** up to 3 short bullet points.
+**Improvements:** up to 3 short bullet points.
 
-Here are the reviews:
+Only mention points that appear in the reviews. If there are only one or two reviews, keep it even shorter. Don't add a preamble or closing remarks.
+
+Reviews:
+
 
 ${reviewsText}`,
     });

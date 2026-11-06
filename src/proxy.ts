@@ -7,19 +7,15 @@ export async function proxy(request: NextRequest) {
         headers: request.headers,
     });
     const url = request.nextUrl
-    if(session && session.user.emailVerified &&(
+    if(session && (
         url.pathname.startsWith("/signin") ||
-        url.pathname.startsWith("/signup") ||
-        url.pathname.startsWith("/verifyEmail")
+        url.pathname.startsWith("/signup")
     )){
         return NextResponse.redirect(new URL('/dashboard', request.url))
     }
 
     if(!session && url.pathname.startsWith("/dashboard")){
         return NextResponse.redirect(new URL('/signin', request.url))
-    }
-    if(session && url.pathname.startsWith("/dashboard") && !session.user.emailVerified){
-        return NextResponse.redirect(new URL('/verifyEmail', request.url))
     }
 
     return NextResponse.next()

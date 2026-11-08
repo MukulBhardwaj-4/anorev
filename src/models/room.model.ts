@@ -3,7 +3,11 @@ import mongoose, { Document } from "mongoose";
 export interface IRoom extends Document{
     creator: string,
     username: string,
-    contentUrl: string,
+    contentUrl?: string,
+    imageUrl?: string,
+    imagePublicId?: string,
+    videoUrl?: string,
+    videoPublicId?: string,
     description: string,
     reviews: mongoose.Types.ObjectId[];
 }
@@ -20,7 +24,18 @@ const roomSchema = new mongoose.Schema<IRoom>({
     },
     contentUrl: {
         type: String,
-        required: true
+    },
+    imageUrl: {
+        type: String,
+    },
+    imagePublicId: {
+        type: String,
+    },
+    videoUrl: {
+        type: String,
+    },
+    videoPublicId: {
+        type: String,
     },
     description: {
         type: String,

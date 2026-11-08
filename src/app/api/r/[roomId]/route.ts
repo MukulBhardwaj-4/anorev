@@ -26,7 +26,7 @@ export const GET = apiHandler(async (request: NextRequest, { params }: {
         throw new ApiError(400, "Room id is required");
     }
 
-    const room = await Room.findById(roomId).select("username description contentUrl creator").lean();
+    const room = await Room.findById(roomId).select("username description contentUrl imageUrl imagePublicId videoUrl videoPublicId creator").lean();
     if (!room) throw new ApiError(404, "Room not found");
 
     const ipHash = getIpHash(request);

@@ -16,13 +16,15 @@ import { zodResolver } from "@hookform/resolvers/zod"
 const formSchema = z.object({
   contentUrl: z
     .string()
-    .nonempty("Content Url is required")
-    .regex(/^https?:\/\/(?:www\.)?[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)+(?:\/[^\s]*)?$/, "Please enter a valid URL"),
+    .optional()
+    .refine((val) => !val || /^https?:\/\/(?:www\.)?[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)+(?:\/[^\s]*)?$/.test(val), "Please enter a valid URL"),
   description: z
     .string()
     .nonempty("Description is required")
     .min(20, "Description must be at least 20 characters")
-    .max(500, "Password must be at most 500 characters"),
+    .max(500, "Description must be at most 500 characters"),
+  image: z.string().optional(),
+  video: z.string().optional(),
 })
 
 export default function page() {
@@ -34,6 +36,8 @@ export default function page() {
     defaultValues: {
       contentUrl: "",
       description: "",
+      image: "",
+      video: "",
     },
     mode: "onSubmit",
     reValidateMode: "onChange",
@@ -41,10 +45,26 @@ export default function page() {
 
   const { errors } = form.formState
 
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>, fieldName: 'image' | 'video') => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        form.setValue(fieldName, reader.result as string);
+      };
+      reader.readAsDataURL(file);
+    }
+  }
+
   const onSubmit = async (formData: z.infer<typeof formSchema>) => {
     setLoading(true)
     try {
-      await api.post("/rooms", formData)
+      await api.post("/rooms", {
+        contentUrl: formData.contentUrl || undefined,
+        description: formData.description,
+        image: formData.image || undefined,
+        video: formData.video || undefined,
+      })
       toast.success("Room created successfully")
       router.push("/dashboard")
 
@@ -70,7 +90,7 @@ export default function page() {
       <div className="mt-8 flex w-full max-w-xl flex-col sm:mt-10">
         <form onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col gap-6">
           <Field className="mb-5">
-            <FieldLabel className="text-xl" htmlFor="input-badge">Content URL</FieldLabel>
+            <FieldLabel className="text-xl" htmlFor="input-badge">Content URL (Optional)</FieldLabel>
             <Input
               id="input-badge"
               placeholder="https://api.example.com"
@@ -82,6 +102,27 @@ export default function page() {
               <p className="text-red-500">{errors.contentUrl.message}</p>
             )}
           </Field>
+
+          <Field className="mb-5">
+            <FieldLabel className="text-xl" htmlFor="input-image">Upload Image (Optional)</FieldLabel>
+            <Input
+              id="input-image"
+              type="file"
+              accept="image/*"
+              onChange={(e) => handleFileChange(e, 'image')}
+            />
+          </Field>
+
+          <Field className="mb-5">
+            <FieldLabel className="text-xl" htmlFor="input-video">Upload Video (Optional)</FieldLabel>
+            <Input
+              id="input-video"
+              type="file"
+              accept="video/*"
+              onChange={(e) => handleFileChange(e, 'video')}
+            />
+          </Field>
+
           <Field className="mb-5">
             <FieldLabel className="text-xl" htmlFor="textarea-disabled">Description</FieldLabel>
             <Textarea

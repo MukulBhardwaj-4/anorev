@@ -10,10 +10,16 @@ import { Textarea } from "@/components/ui/textarea"
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { api } from "@/utils/ApiClient";
+import { CldImage, CldVideoPlayer } from "next-cloudinary";
+import "next-cloudinary/dist/cld-video-player.css";
 
 type Room = {
     username: string,
-    contentUrl: string;
+    contentUrl?: string;
+    imageUrl?: string;
+    imagePublicId?: string;
+    videoUrl?: string;
+    videoPublicId?: string;
     description: string;
 };
 
@@ -110,20 +116,64 @@ export default function page() {
                             </div>
                         </CardHeader>
                         <CardContent className="space-y-6">
-                            <div>
-                                <p className="text-s font-medium text-muted-foreground uppercase tracking-wide mb-1">
-                                    Content URL
-                                </p>
-                                <a
-                                    href={room?.contentUrl}
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    className="inline-flex items-center gap-1 text-blue-400 hover:underline font-medium break-all"
-                                >
-                                    {room?.contentUrl}
-                                    <ExternalLink className="h-4 w-4 shrink-0" />
-                                </a>
-                            </div>
+                            {room?.contentUrl && (
+                                <div>
+                                    <p className="text-s font-medium text-muted-foreground uppercase tracking-wide mb-1">
+                                        Content URL
+                                    </p>
+                                    <a
+                                        href={room?.contentUrl}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="inline-flex items-center gap-1 text-blue-400 hover:underline font-medium break-all"
+                                    >
+                                        {room?.contentUrl}
+                                        <ExternalLink className="h-4 w-4 shrink-0" />
+                                    </a>
+                                </div>
+                            )}
+
+                            {(room?.imagePublicId || room?.imageUrl) && (
+                                <div>
+                                    <p className="text-s font-medium text-muted-foreground uppercase tracking-wide mb-1">
+                                        Image
+                                    </p>
+                                    <div className="rounded-lg overflow-hidden border">
+                                        {room?.imagePublicId ? (
+                                            <CldImage
+                                                src={room.imagePublicId}
+                                                width={800}
+                                                height={600}
+                                                alt="Room image"
+                                                className="w-full h-auto object-cover max-h-[400px]"
+                                            />
+                                        ) : (
+                                            <img src={room.imageUrl} alt="Room image" className="w-full h-auto object-cover max-h-[400px]" />
+                                        )}
+                                    </div>
+                                </div>
+                            )}
+
+                            {(room?.videoPublicId || room?.videoUrl) && (
+                                <div>
+                                    <p className="text-s font-medium text-muted-foreground uppercase tracking-wide mb-1">
+                                        Video
+                                    </p>
+                                    <div className="rounded-lg overflow-hidden border">
+                                        {room?.videoPublicId ? (
+                                            <CldVideoPlayer
+                                                src={room.videoPublicId}
+                                                width={1920}
+                                                height={1080}
+                                                className="w-full h-auto max-h-[400px]"
+                                            />
+                                        ) : (
+                                            <video src={room.videoUrl} controls className="w-full h-auto max-h-[400px]" />
+                                        )}
+                                    </div>
+                                </div>
+                            )}
+
                             <div>
                                 <p className="text-s font-medium text-muted-foreground uppercase tracking-wide mb-1">
                                     Description

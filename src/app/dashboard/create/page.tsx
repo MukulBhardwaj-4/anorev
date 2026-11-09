@@ -12,6 +12,7 @@ import { useForm } from "react-hook-form"
 import { api } from "@/utils/ApiClient"
 import z from "zod"
 import { zodResolver } from "@hookform/resolvers/zod"
+import { CldUploadWidget } from "next-cloudinary"
 
 const formSchema = z.object({
   contentUrl: z
@@ -23,13 +24,20 @@ const formSchema = z.object({
     .nonempty("Description is required")
     .min(20, "Description must be at least 20 characters")
     .max(500, "Description must be at most 500 characters"),
-  image: z.string().optional(),
-  video: z.string().optional(),
+  image: z.any().optional(),
+  video: z.any().optional(),
 })
+
+type UploadResult = {
+  url: string
+  publicId: string
+}
 
 export default function page() {
   const router = useRouter();
   const [loading, setLoading] = useState(false)
+  const [image, setImage] = useState<UploadResult | null>(null)
+  const [video, setVideo] = useState<UploadResult | null>(null)
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -45,15 +53,16 @@ export default function page() {
 
   const { errors } = form.formState
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>, fieldName: 'image' | 'video') => {
-    const file = e.target.files?.[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        form.setValue(fieldName, reader.result as string);
-      };
-      reader.readAsDataURL(file);
+  const handleUploadSuccess = (
+    setter: (r: UploadResult) => void,
+    result: any
+  ) => {
+    const info = result.info
+    if (typeof info === 'string' || !info?.secure_url || !info?.public_id) {
+      toast.error("Upload succeeded but response was invalid")
+      return
     }
+    setter({ url: info.secure_url, publicId: info.public_id })
   }
 
   const onSubmit = async (formData: z.infer<typeof formSchema>) => {
@@ -62,12 +71,13 @@ export default function page() {
       await api.post("/rooms", {
         contentUrl: formData.contentUrl || undefined,
         description: formData.description,
-        image: formData.image || undefined,
-        video: formData.video || undefined,
+        imageUrl: image?.url,
+        imagePublicId: image?.publicId,
+        videoUrl: video?.url,
+        videoPublicId: video?.publicId,
       })
       toast.success("Room created successfully")
       router.push("/dashboard")
-
     } catch (error: any) {
       toast.error(error.message)
       setLoading(false)
@@ -105,22 +115,42 @@ export default function page() {
 
           <Field className="mb-5">
             <FieldLabel className="text-xl" htmlFor="input-image">Upload Image (Optional)</FieldLabel>
-            <Input
-              id="input-image"
-              type="file"
-              accept="image/*"
-              onChange={(e) => handleFileChange(e, 'image')}
-            />
+            <CldUploadWidget
+              uploadPreset="ml_default"
+              options={{
+                folder: "anorev/images",
+                resourceType: "image",
+                maxFileSize: 10 * 1024 * 1024,
+              }}
+              onSuccess={(result: any) => handleUploadSuccess(setImage, result)}
+              onError={(error: any) => toast.error(error?.message || "Upload failed")}
+            >
+              {({ open }) => (
+                <Button type="button" variant="outline" onClick={() => open?.()}>
+                  {image ? `Uploaded: ${image.publicId}` : "Upload Image"}
+                </Button>
+              )}
+            </CldUploadWidget>
           </Field>
 
           <Field className="mb-5">
             <FieldLabel className="text-xl" htmlFor="input-video">Upload Video (Optional)</FieldLabel>
-            <Input
-              id="input-video"
-              type="file"
-              accept="video/*"
-              onChange={(e) => handleFileChange(e, 'video')}
-            />
+            <CldUploadWidget
+              uploadPreset="ml_default"
+              options={{
+                folder: "anorev/videos",
+                resourceType: "video",
+                maxFileSize: 100 * 1024 * 1024,
+              }}
+              onSuccess={(result: any) => handleUploadSuccess(setVideo, result)}
+              onError={(error: any) => toast.error(error?.message || "Upload failed")}
+            >
+              {({ open }) => (
+                <Button type="button" variant="outline" onClick={() => open?.()}>
+                  {video ? `Uploaded: ${video.publicId}` : "Upload Video"}
+                </Button>
+              )}
+            </CldUploadWidget>
           </Field>
 
           <Field className="mb-5">

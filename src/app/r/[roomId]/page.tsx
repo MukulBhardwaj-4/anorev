@@ -98,22 +98,10 @@ export default function page() {
     }
     else if (submitted) {
         return (
-            <div>
-                <div className="container max-w-4xl mx-auto space-y-8 px-4 py-8 sm:space-y-10 sm:px-6 sm:py-10">
-                    {reviews.length > 0 && (
-                        <>
-                            <Separator />
-                            <section className="space-y-6">
-                                <h2 className="text-2xl font-semibold">Reviews</h2>
-                                <div className="space-y-4">
-                                    {reviews.map((review, index) => (
-                                        <Review key={review.ipHash ?? index} review={review.textReview} />
-                                    ))}
-                                </div>
-                            </section>
-                        </>
-                    )}
-                </div>
+            <div className="flex min-h-screen w-full items-center justify-center px-4 text-center">
+                <h2 className="scroll-m-20 border-b pb-2 text-2xl font-semibold tracking-tight first:mt-0 sm:text-3xl">
+                    Review already submitted
+                </h2>
             </div>
         )
     }

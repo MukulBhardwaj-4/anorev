@@ -57,18 +57,6 @@ export default function page() {
         getStatus();
     }, [])
 
-    useEffect(() => {
-        if (!roomId) return;
-        const channel = pusherClient.subscribe(`private-${roomId}`);
-        channel.bind("new-review", ({ review }) => {
-            setReviews((prev: any[]) => [...prev, review]);
-        });
-
-        return () => {
-            channel.unbind("new-review");
-            pusherClient.unsubscribe(`private-${roomId}`);
-        };
-    }, [roomId]);
     const handleSubmit = async () => {
         setLoading(true);
         try {

@@ -79,7 +79,14 @@ export const POST = apiHandler(async (request: NextRequest, { params }: {
         throw new ApiError(404, "Room not found");
     }
 
-    after(() => pusherServer.trigger(`private-${roomId}`, "new-review", { review }));
-
-    return NextResponse.json(new ApiResponse(201, review), { status: 201 });
-});
+    after(async () => {
+        try {
+            await pusherServer.trigger(`private-${roomId}`, "new-review", {
+                review: { _id: review._id, textReview: review.textReview, createdAt: review.createdAt },
+            });
+        } catch (error) {
+            console.error("Pusher trigger failed", error);
+        }
+    });
+        return NextResponse.json(new ApiResponse(201, review), { status: 201 });
+    });

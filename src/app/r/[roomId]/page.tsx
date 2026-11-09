@@ -12,6 +12,8 @@ import { Button } from "@/components/ui/button";
 import { api } from "@/utils/ApiClient";
 import { CldImage, CldVideoPlayer } from "next-cloudinary";
 import "next-cloudinary/dist/cld-video-player.css";
+import { pusherClient } from "@/lib/pusherClient";
+import Review from "@/components/Review";
 
 type Room = {
     username: string,
@@ -31,7 +33,8 @@ export default function page() {
     const [loading, setLoading] = useState(true)
     const [review, setReview] = useState("")
     const [submitted, setSubmitted] = useState(false);
-    const [roomFound, setRoomFound] = useState(true)
+    const [roomFound, setRoomFound] = useState(true);
+    const [reviews, setReviews] = useState<any[]>([])
 
     useEffect(() => {
         const getStatus = async () => {
@@ -53,6 +56,19 @@ export default function page() {
         };
         getStatus();
     }, [])
+
+    useEffect(() => {
+        if (!roomId) return;
+        const channel = pusherClient.subscribe(`private-${roomId}`);
+        channel.bind("new-review", ({ review }) => {
+            setReviews((prev: any[]) => [...prev, review]);
+        });
+
+        return () => {
+            channel.unbind("new-review");
+            pusherClient.unsubscribe(`private-${roomId}`);
+        };
+    }, [roomId]);
     const handleSubmit = async () => {
         setLoading(true);
         try {
@@ -94,10 +110,22 @@ export default function page() {
     }
     else if (submitted) {
         return (
-            <div className="flex min-h-screen w-full items-center justify-center px-4 text-center">
-                <h2 className="scroll-m-20 border-b pb-2 text-2xl font-semibold tracking-tight first:mt-0 sm:text-3xl">
-                    Review Submitted successfully
-                </h2>
+            <div>
+                <div className="container max-w-4xl mx-auto space-y-8 px-4 py-8 sm:space-y-10 sm:px-6 sm:py-10">
+                    {reviews.length > 0 && (
+                        <>
+                            <Separator />
+                            <section className="space-y-6">
+                                <h2 className="text-2xl font-semibold">Reviews</h2>
+                                <div className="space-y-4">
+                                    {reviews.map((review, index) => (
+                                        <Review key={review.ipHash ?? index} review={review.textReview} />
+                                    ))}
+                                </div>
+                            </section>
+                        </>
+                    )}
+                </div>
             </div>
         )
     }
@@ -105,7 +133,20 @@ export default function page() {
         return (
             <div>
                 <div className="container max-w-4xl mx-auto space-y-8 px-4 py-8 sm:space-y-10 sm:px-6 sm:py-10">
-                    <Card>
+                {reviews.length > 0 && (
+                    <>
+                        <Separator />
+                        <section className="space-y-6">
+                            <h2 className="text-2xl font-semibold">Reviews</h2>
+                            <div className="space-y-4">
+                                {reviews.map((review, index) => (
+                                    <Review key={review.ipHash ?? index} review={review.textReview} />
+                                ))}
+                            </div>
+                        </section>
+                    </>
+                )}
+                <Card>
                         <CardHeader>
                             <div className="flex flex-wrap items-start justify-between gap-4">
                                 <CardTitle className="text-xl sm:text-2xl">Review Request</CardTitle>

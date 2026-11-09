@@ -121,6 +121,23 @@ export default function page() {
                 folder: "anorev/images",
                 resourceType: "image",
                 maxFileSize: 10 * 1024 * 1024,
+                styles: {
+                  palette: {
+                    window: "#0a0a0a",       
+                    sourceBg: "#171717",      
+                    windowBorder: "#404040",
+                    tabIcon: "#ffffff",
+                    inactiveTabIcon: "#737373",
+                    menuIcons: "#a3a3a3",
+                    link: "#3b82f6",
+                    action: "#3b82f6",     
+                    inProgress: "#3b82f6",
+                    complete: "#22c55e",
+                    error: "#ef4444",
+                    textDark: "#fafafa",      
+                    textLight: "#ffffff",
+                  },
+                },
               }}
               onSuccess={(result: any) => handleUploadSuccess(setImage, result)}
               onError={(error: any) => toast.error(error?.message || "Upload failed")}
@@ -141,9 +158,27 @@ export default function page() {
                 folder: "anorev/videos",
                 resourceType: "video",
                 maxFileSize: 100 * 1024 * 1024,
+                styles: {
+                  palette: {
+                    window: "#0a0a0a",      
+                    sourceBg: "#171717",    
+                    windowBorder: "#404040",
+                    tabIcon: "#ffffff",
+                    inactiveTabIcon: "#737373",
+                    menuIcons: "#a3a3a3",
+                    link: "#3b82f6",
+                    action: "#3b82f6",       
+                    inProgress: "#3b82f6",
+                    complete: "#22c55e",
+                    error: "#ef4444",
+                    textDark: "#fafafa",     
+                    textLight: "#ffffff",
+                  },
+                },
               }}
               onSuccess={(result: any) => handleUploadSuccess(setVideo, result)}
               onError={(error: any) => toast.error(error?.message || "Upload failed")}
+
             >
               {({ open }) => (
                 <Button type="button" variant="outline" onClick={() => open?.()}>
